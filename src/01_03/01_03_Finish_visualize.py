@@ -1,93 +1,54 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Apr 28 15:46:31 2019
-
-@author: berkunis
-"""
-##############################################01_02_PythonLibraries#####################################################
+# Load necessary libraries
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import seaborn as sns
 
-#import data
+# Load the dataset
 data = pd.read_csv("input/insurance.csv")
 
-#see the first 15 lines of data
+# Display the first 15 rows of the dataset
+print("First 15 rows of the dataset:")
 print(data.head(15))
 
-############################################01_03_HandlingMissingValues###################################################
+# Handling Missing Values
+# Check for missing values
+print("\nMissing values before imputation:")
+print(data.isnull().sum())
 
-#check how many values are missing (NaN) before we apply the methods below 
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
+# Fill missing values using mean imputation
+imputer = SimpleImputer(strategy="mean")
+data["bmi"] = imputer.fit_transform(data[["bmi"]])
 
-#fill in the missing values (we will look at 4 options for this course - there are so many other methods out there.)
+# Check for missing values after imputation
+print("\nMissing values after imputation:")
+print(data.isnull().sum())
 
-#option0 for dropping the entire column
-data = pd.read_csv("input/insurance.csv") # reloading fresh dataset for option 0
-data.drop('bmi', axis = 1, inplace = True)
-#check how many values are missing (NaN) - after we dropped 'bmi'
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
+# Visualization: Age vs Charges
+plt.figure(figsize=(12, 8))
+sns.lmplot(
+    x="age", y="charges", hue="smoker", data=data, palette="coolwarm",
+    height=6, aspect=2, facet_kws={"legend_out": False}  # Avoid deprecated warning
+)
+plt.title("Age vs Charges (Smokers vs Non-Smokers)", fontsize=16)
+plt.xlabel("Age", fontsize=12)
+plt.ylabel("Charges", fontsize=12)
 
-#option1 for dropping NAN
-data = pd.read_csv("input/insurance.csv") # reloading fresh dataset for option 1
-data.dropna(inplace=True)
-data.reset_index(drop=True, inplace=True)
-#check how many values are missing (NaN) - after we filled in the NaN
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
+# Adjust legend position
+plt.legend(title="Smoker", loc="center left", bbox_to_anchor=(1.05, 0.5), fontsize=12)
 
-#option2 for filling NaN # reloading fresh dataset for option 2
-data = pd.read_csv("input/insurance.csv")
-imputer = SimpleImputer(strategy='mean')
-imputer.fit(data['bmi'].values.reshape(-1, 1))
-data['bmi'] = imputer.transform(data['bmi'].values.reshape(-1, 1))
-#check how many values are missing (NaN) - after we filled in the NaN
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
+plt.tight_layout()
+plt.savefig("output/01_03_age_vs_charges.png")
+plt.close()
 
-#option3 for filling NaN # reloading fresh dataset for option 3
-data = pd.read_csv("input/insurance.csv")
-data['bmi'].fillna(data['bmi'].mean(), inplace = True)
-print(data.head(15))
-#check how many values are missing (NaN) - after we filled in the NaN
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
-
-
-############################################Vizualization################################################################
-
-figure, ax = plt.subplots(4,2, figsize=(12,24))
-
-#See the distrubution of the data
-sns.distplot(data['charges'],ax= ax[0,0])
-sns.distplot(data['age'],ax=ax[0,1])
-sns.distplot(data['bmi'],ax= ax[1,0])
-sns.distplot(data['children'],ax= ax[1,1])
-
-
-sns.countplot(data['sex'],ax=ax[2,0])
-sns.countplot(data['smoker'],ax= ax[2,1])
-sns.countplot(data['region'],ax= ax[3,0])
-
-
-
-#visualizeing skewness
-sns.pairplot(data)
-
-#Lets look at smokers vs non-smokers on age vs charges:
-
-sns.lmplot(x="age", y="charges", hue="smoker", data=data, palette = 'muted', height = 7)
-plt.show(sns)
-
-#Lets look at correlation:
-
-corr = data.corr()
-
-sns.heatmap(corr, cmap = 'Wistia', annot= True)
-plt.show(sns)
+# Visualization: Correlation Heatmap
+plt.figure(figsize=(12, 8))
+numeric_data = data.select_dtypes(include=[np.number])
+corr = numeric_data.corr()
+sns.heatmap(corr, cmap="Wistia", annot=True)
+plt.title("Correlation Heatmap", fontsize=16)
+plt.tight_layout()
+plt.savefig("output/01_03_correlation_heatmap.png")
+plt.close()
