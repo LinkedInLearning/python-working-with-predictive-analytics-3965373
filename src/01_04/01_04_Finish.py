@@ -1,142 +1,87 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Apr 28 15:46:31 2019
-
-@author: berkunis
-"""
-##############################################01_02_PythonLibraries#####################################################
+# Load necessary libraries
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
-import matplotlib.pyplot as plt 
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.preprocessing import LabelEncoder
-
-
-
-
-
-#import data
+# Load the dataset
 data = pd.read_csv("input/insurance.csv")
 
-#see the first 15 lines of data
+# Display the first 15 rows of the dataset
+print("First 15 rows of the dataset:")
 print(data.head(15))
 
-############################################01_03_HandlingMissingValues###################################################
+# Handling Missing Values
 
-#check how many values are missing (NaN) before we apply the methods below 
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
+# Option 0: Drop the entire column with missing values
+print("\nOption 0: Drop the 'bmi' column")
+data_option0 = data.copy()
+data_option0.drop('bmi', axis=1, inplace=True)
+print("Missing values after dropping the 'bmi' column:")
+print(data_option0.isnull().sum())
 
-#fill in the missing values (we will look at 4 options for this course - there are so many other methods out there.)
+# Option 1: Drop rows with any missing values
+print("\nOption 1: Drop rows with missing values")
+data_option1 = data.copy()
+data_option1.dropna(inplace=True)
+data_option1.reset_index(drop=True, inplace=True)
+print("Missing values after dropping rows with missing values:")
+print(data_option1.isnull().sum())
 
-#option0 for dropping the entire column
-data = pd.read_csv("input/insurance.csv") # reloading fresh dataset for option 0
-data.drop('bmi', axis = 1, inplace = True)
-#check how many values are missing (NaN) - after we dropped 'bmi'
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
+# Option 2: Fill missing values with mean (using SimpleImputer)
+print("\nOption 2: Fill missing values with mean (SimpleImputer)")
+data_option2 = data.copy()
+imputer = SimpleImputer(strategy="mean")
+data_option2['bmi'] = imputer.fit_transform(data_option2[['bmi']])
+print("Missing values after filling with mean (SimpleImputer):")
+print(data_option2.isnull().sum())
 
-#option1 for dropping NAN
-data = pd.read_csv("input/insurance.csv") # reloading fresh dataset for option 1
-data.dropna(inplace=True)
-data.reset_index(drop=True, inplace=True)
-#check how many values are missing (NaN) - after we filled in the NaN
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
+# Option 3: Fill missing values with mean (using pandas)
+print("\nOption 3: Fill missing values with mean (pandas)")
+data_option3 = data.copy()
+data_option3['bmi'] = data_option3['bmi'].fillna(data_option3['bmi'].mean())
+print("Missing values after filling with mean (pandas):")
+print(data_option3.isnull().sum())
 
-#option2 for filling NaN # reloading fresh dataset for option 2
-data = pd.read_csv("input/insurance.csv")
-imputer = SimpleImputer(strategy='mean')
-imputer.fit(data['bmi'].values.reshape(-1, 1))
-data['bmi'] = imputer.transform(data['bmi'].values.reshape(-1, 1))
-#check how many values are missing (NaN) - after we filled in the NaN
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
+# Convert Categorical Data into Numbers
 
-#option3 for filling NaN # reloading fresh dataset for option 3
-data = pd.read_csv("input/insurance.csv")
-data['bmi'].fillna(data['bmi'].mean(), inplace = True)
-print(data.head(15))
-#check how many values are missing (NaN) - after we filled in the NaN
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
-
-
-############################################01_04_ConvertCategoricalDataintoNumbers##############################################
-#option0: pandas factorizing: maps each category to a different integer = label encoder 
-
-#create series for pandas
-
-region = data["region"] # series 
+# Option 0: Pandas factorize (Label Encoding)
+print("\nOption 0: Pandas factorize for label encoding")
+region = data["region"]
 region_encoded, region_categories = pd.factorize(region)
-factor_region_mapping = dict(zip(region_categories, region_encoded)) #mapping of encoded numbers and original categories. 
+factor_region_mapping = dict(zip(region_categories, region_encoded))
+print("Original Region Categories:", region[:10])
+print("Region Categories:", region_categories)
+print("Encoded Region Values:", region_encoded[:10])
+print("Factor Region Mapping:", factor_region_mapping)
 
-print("Pandas factorize function for label encoding with series")  
-print(region[:10]) #original version 
-print(region_categories) #list of categories
-print(region_encoded[:10]) #encoded numbers for categories 
-print(factor_region_mapping) # print factor mapping
+# Option 1: Pandas get_dummies (One-Hot Encoding)
+print("\nOption 1: Pandas get_dummies for one-hot encoding")
+region_encoded_df = pd.get_dummies(region, prefix='', prefix_sep='')
+print("Original Region Categories:", region[:10])
+print("One-Hot Encoded Values:")
+print(region_encoded_df[:10])
 
-#option1: pandas get_dummies: maps each category to 0 (cold) or 1 (hot) = one hot encoder 
-
-#create series for pandas
-region = data["region"] # series 
-region_encoded = pd.get_dummies(region, prefix='')
-
-print("Pandas get_dummies function for one hot encoding with series")  
-
-print(region[:10]) #original version 
-print(region_encoded[:10]) #encoded numbers for categories 
-
-#option2: sklearn label encoding: maps each category to a different integer
-
-#create ndarray for label encodoing (sklearn)
-sex = data.iloc[:,1:2].values
-smoker = data.iloc[:,4:5].values
-
-#label encoder = le
-
-
-## le for sex
+# Option 2: Sklearn Label Encoding
+print("\nOption 2: Sklearn Label Encoding for 'sex' and 'smoker'")
 le = LabelEncoder()
-sex[:,0] = le.fit_transform(sex[:,0])
-sex = pd.DataFrame(sex)
-sex.columns = ['sex']
-le_sex_mapping = dict(zip(le.classes_, le.transform(le.classes_)))
-print("Sklearn label encoder results for sex:")
-print(le_sex_mapping)
-print(sex[:10])
 
-## le for smoker
-le = LabelEncoder()
-smoker[:,0] = le.fit_transform(smoker[:,0])
-smoker = pd.DataFrame(smoker)
-smoker.columns = ['smoker']
-le_smoker_mapping = dict(zip(le.classes_, le.transform(le.classes_)))
-print("Sklearn label encoder results for smoker:")
-print(le_smoker_mapping)
-print(smoker[:10])
+# Encoding 'sex'
+data['sex_encoded'] = le.fit_transform(data['sex'])
+sex_mapping = dict(zip(le.classes_, le.transform(le.classes_)))
+print("Sex Encoding Mapping:", sex_mapping)
+print(data[['sex', 'sex_encoded']].head())
 
-#option3: sklearn one hot encoding: maps each category to 0 (cold) or 1 (hot) 
+# Encoding 'smoker'
+data['smoker_encoded'] = le.fit_transform(data['smoker'])
+smoker_mapping = dict(zip(le.classes_, le.transform(le.classes_)))
+print("Smoker Encoding Mapping:", smoker_mapping)
+print(data[['smoker', 'smoker_encoded']].head())
 
-#one hot encoder = ohe
-
-#create ndarray for one hot encodoing (sklearn)
-region = data.iloc[:,5:6].values #ndarray
-
-## ohe for region
-ohe = OneHotEncoder() 
-
-region = ohe.fit_transform(region).toarray()
-region = pd.DataFrame(region)
-region.columns = ['northeast', 'northwest', 'southeast', 'southwest']
-print("Sklearn one hot encoder results for region:")  
-print(region[:10])
-
-
-
-
+# Option 3: Sklearn One-Hot Encoding
+print("\nOption 3: Sklearn One-Hot Encoding for 'region'")
+ohe = OneHotEncoder(sparse_output=False)
+region_encoded = ohe.fit_transform(data[['region']])
+region_encoded_df = pd.DataFrame(region_encoded, columns=ohe.get_feature_names_out(['region']))
+print("One-Hot Encoded Region Values:")
+print(region_encoded_df.head())

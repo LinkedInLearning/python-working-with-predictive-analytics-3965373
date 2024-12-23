@@ -1,169 +1,68 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Apr 28 15:46:31 2019
-
-@author: berkunis
-"""
-##############################################01_02_PythonLibraries#####################################################
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
-import matplotlib.pyplot as plt 
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, OneHotEncoder, LabelEncoder
 
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.preprocessing import LabelEncoder
-
-
-
-
-
-#import data
+# Load the dataset
 data = pd.read_csv("input/insurance.csv")
 
-#see the first 15 lines of data
+# Display the first 15 rows of the dataset
+print("First 15 rows of the dataset:")
 print(data.head(15))
 
-############################################01_03_HandlingMissingValues###################################################
+# Handling Missing Values
 
-#check how many values are missing (NaN) before we apply the methods below 
-count_nan = data.isnull().sum() # the number of missing values for every column
+# Check how many values are missing (NaN) before applying methods
+count_nan = data.isnull().sum()
+print("\nMissing values before handling:")
 print(count_nan[count_nan > 0])
 
-#fill in the missing values (we will look at 4 options for this course - there are so many other methods out there.)
-
-#option0 for dropping the entire column
-data = pd.read_csv("input/insurance.csv") # reloading fresh dataset for option 0
-data.drop('bmi', axis = 1, inplace = True)
-#check how many values are missing (NaN) - after we dropped 'bmi'
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
-
-#option1 for dropping NAN
-data = pd.read_csv("input/insurance.csv") # reloading fresh dataset for option 1
-data.dropna(inplace=True)
-data.reset_index(drop=True, inplace=True)
-#check how many values are missing (NaN) - after we filled in the NaN
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
-
-#option2 for filling NaN # reloading fresh dataset for option 2
-data = pd.read_csv("input/insurance.csv")
+# Fill missing values with mean (SimpleImputer)
 imputer = SimpleImputer(strategy='mean')
-imputer.fit(data['bmi'].values.reshape(-1, 1))
-data['bmi'] = imputer.transform(data['bmi'].values.reshape(-1, 1))
-#check how many values are missing (NaN) - after we filled in the NaN
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
+data['bmi'] = imputer.fit_transform(data[['bmi']])
+print("\nMissing values after filling with mean (SimpleImputer):")
+print(data.isnull().sum())
 
-#option3 for filling NaN # reloading fresh dataset for option 3
-data = pd.read_csv("input/insurance.csv")
-data['bmi'].fillna(data['bmi'].mean(), inplace = True)
-print(data.head(15))
-#check how many values are missing (NaN) - after we filled in the NaN
-count_nan = data.isnull().sum() # the number of missing values for every column
-print(count_nan[count_nan > 0])
+# Convert Categorical Data into Numbers
 
-
-############################################01_04_ConvertCategoricalDataintoNumbers##############################################
-#option0: pandas factorizing: maps each category to a different integer = label encoder 
-
-#create series for pandas
-
-region = data["region"] # series 
+# Pandas factorize (Label Encoding)
+region = data["region"]
 region_encoded, region_categories = pd.factorize(region)
-factor_region_mapping = dict(zip(region_categories, region_encoded)) #mapping of encoded numbers and original categories. 
+print("\nPandas factorize results for 'region':")
+print("Region Mapping:", dict(zip(region_categories, region_encoded)))
 
-print("Pandas factorize function for label encoding with series")  
-print(region[:10]) #original version 
-print(region_categories) #list of categories
-print(region_encoded[:10]) #encoded numbers for categories 
-print(factor_region_mapping) # print factor mapping
+# Pandas get_dummies (One-Hot Encoding)
+region_encoded_df = pd.get_dummies(region, prefix='', prefix_sep='')
+print("\nPandas get_dummies results for 'region':")
+print(region_encoded_df.head(10))
 
-#option1: pandas get_dummies: maps each category to 0 (cold) or 1 (hot) = one hot encoder 
-
-#create series for pandas
-region = data["region"] # series 
-region_encoded = pd.get_dummies(region, prefix='')
-
-print("Pandas get_dummies function for one hot encoding with series")  
-
-print(region[:10]) #original version 
-print(region_encoded[:10]) #encoded numbers for categories 
-
-#option2: sklearn label encoding: maps each category to a different integer
-
-#create ndarray for label encodoing (sklearn)
-sex = data.iloc[:,1:2].values
-smoker = data.iloc[:,4:5].values
-
-#label encoder = le
-
-## le for sex
+# Sklearn Label Encoding
 le = LabelEncoder()
-sex[:,0] = le.fit_transform(sex[:,0])
-sex = pd.DataFrame(sex)
-sex.columns = ['sex']
-le_sex_mapping = dict(zip(le.classes_, le.transform(le.classes_)))
-print("Sklearn label encoder results for sex:")
-print(le_sex_mapping)
-print(sex[:10])
+data['sex_encoded'] = le.fit_transform(data['sex'])
+data['smoker_encoded'] = le.fit_transform(data['smoker'])
+print("\nSklearn Label Encoding results:")
+print(data[['sex', 'sex_encoded']].head())
+print(data[['smoker', 'smoker_encoded']].head())
 
-## le for smoker
-le = LabelEncoder()
-smoker[:,0] = le.fit_transform(smoker[:,0])
-smoker = pd.DataFrame(smoker)
-smoker.columns = ['smoker']
-le_smoker_mapping = dict(zip(le.classes_, le.transform(le.classes_)))
-print("Sklearn label encoder results for smoker:") 
-print(le_smoker_mapping)
-print(smoker[:10])
+# Sklearn One-Hot Encoding
+ohe = OneHotEncoder(sparse_output=False)
+region_encoded = ohe.fit_transform(data[['region']])
+region_encoded_df = pd.DataFrame(region_encoded, columns=ohe.get_feature_names_out(['region']))
+print("\nSklearn One-Hot Encoding results for 'region':")
+print(region_encoded_df.head(10))
 
-#option3: sklearn one hot encoding: maps each category to 0 (cold) or 1 (hot) 
+# Dividing the Data into Train and Test Sets
 
-#one hot encoder = ohe
-
-#create ndarray for one hot encodoing (sklearn)
-region = data.iloc[:,5:6].values #ndarray
-
-## ohe for region
-ohe = OneHotEncoder() 
-
-region = ohe.fit_transform(region).toarray()
-region = pd.DataFrame(region)
-region.columns = ['northeast', 'northwest', 'southeast', 'southwest']
-print("Sklearn one hot encoder results for region:")  
-print(region[:10])
-
-
-############################################01_05_DividingtheDataintoTestandTrain##############################################
-
-#putting the data together:
-
-##take the numerical data from the original data
+# Combine numerical and encoded categorical data
 X_num = data[['age', 'bmi', 'children']].copy()
+X_final = pd.concat([X_num, region_encoded_df, data[['sex_encoded', 'smoker_encoded']]], axis=1)
 
-##take the encoded data and add to numerical data
-X_final = pd.concat([X_num, region, sex, smoker], axis = 1)
-
-#define y as being the "charges column" from the original dataset
+# Define target variable (y)
 y_final = data[['charges']].copy()
 
-#Test train split
-X_train, X_test, y_train, y_test = train_test_split(X_final, y_final, test_size = 0.33, random_state = 0 )
-#X_train, X_test, y_train, y_test = train_test_split(data[['age']], y_final, test_size = 0.33, random_state = 0 )
+# Test train split
+X_train, X_test, y_train, y_test = train_test_split(X_final, y_final, test_size=0.33, random_state=0)
 
-############################################01_06_FeatureScaling##############################################
-
-#normalized scaler (fit transform on train, fit only on test)
-
-
-
-#standard scaler (fit transform on train, fit only on test)
-
-
-
-
+# Feature Scaling
+# Placeholder for normalized and standard scaling
