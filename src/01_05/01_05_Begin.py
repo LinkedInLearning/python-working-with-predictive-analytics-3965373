@@ -1,9 +1,8 @@
-# Load necessary libraries
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.model_selection import train_test_split
 
 # Load the dataset
 data = pd.read_csv("input/insurance.csv")
@@ -13,53 +12,26 @@ print("First 15 rows of the dataset:")
 print(data.head(15))
 
 # Handling Missing Values
-
-# Check how many values are missing (NaN) before applying methods
-count_nan = data.isnull().sum()
-print("\nMissing values before handling:")
-print(count_nan[count_nan > 0])
-
-# Fill missing values with mean (SimpleImputer)
-imputer = SimpleImputer(strategy='mean')
-data['bmi'] = imputer.fit_transform(data[['bmi']])
-print("\nMissing values after filling with mean (SimpleImputer):")
+# Fill missing values in 'bmi' with mean (Option 3 from previous module)
+imputer = SimpleImputer(strategy="mean")
+data["bmi"] = imputer.fit_transform(data[["bmi"]])
+print("\nOption 3: Fill missing values with mean (SimpleImputer)")
 print(data.isnull().sum())
 
-# Convert Categorical Data into Numbers
-
-# Pandas factorize (Label Encoding)
-region = data["region"]
-region_encoded, region_categories = pd.factorize(region)
-print("\nPandas factorize results for 'region':")
-print("Region Mapping:", dict(zip(region_categories, region_encoded)))
-
-# Pandas get_dummies (One-Hot Encoding)
-region_encoded_df = pd.get_dummies(region, prefix='', prefix_sep='')
-print("\nPandas get_dummies results for 'region':")
-print(region_encoded_df.head(10))
-
-# Sklearn Label Encoding
+# Encoding Categorical Variables
+# Label encode 'sex' and 'smoker'
 le = LabelEncoder()
-data['sex_encoded'] = le.fit_transform(data['sex'])
-data['smoker_encoded'] = le.fit_transform(data['smoker'])
-print("\nSklearn Label Encoding results:")
-print(data[['sex', 'sex_encoded']].head())
-print(data[['smoker', 'smoker_encoded']].head())
+data['sex'] = le.fit_transform(data['sex'])
+data['smoker'] = le.fit_transform(data['smoker'])
 
-# Sklearn One-Hot Encoding
-ohe = OneHotEncoder(sparse_output=False)
+# One hot encode 'region'
+ohe = OneHotEncoder(sparse_output=False, drop='first')
 region_encoded = ohe.fit_transform(data[['region']])
-region_encoded_df = pd.DataFrame(region_encoded, columns=ohe.get_feature_names_out(['region']))
-print("\nSklearn One-Hot Encoding results for 'region':")
-print(region_encoded_df.head(10))
+region_columns = ohe.get_feature_names_out(['region'])
+region_df = pd.DataFrame(region_encoded, columns=region_columns)
 
-# Dividing the Data into Train and Test Sets
+# TODO: Combine numerical columns (age, bmi, children) with encoded columns (region, sex, smoker)
 
-# Combine numerical and encoded categorical data
-# Placeholder for combining numerical and encoded data
+# TODO: Assign response variable ('charges') to y_final
 
-# Define target variable (y) and features (X)
-# Placeholder for defining X and y
-
-# Split the data into training and testing sets
-# Placeholder for train-test split
+# TODO: Split the data into train and test sets using train_test_split
