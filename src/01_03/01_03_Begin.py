@@ -1,7 +1,6 @@
 # Load necessary libraries
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -14,12 +13,20 @@ print("First 15 rows of the dataset:")
 print(data.head(15))
 
 # Handling Missing Values
-# Check for missing values
 
-# Fill missing values using mean imputation
+# TODO: Check how many values are missing (NaN)
 
-# Check for missing values after imputation
+# Option 1: Drop the entire column with missing values
+# TODO: Add code to drop the 'bmi' column and verify
 
-# Visualization: Age vs Charges
+# Option 2: Drop rows with missing values
+# TODO: Add code to drop rows with missing values and verify
 
-# Visualization: Correlation Heatmap
+# Option 3: Fill missing values with mean (SimpleImputer)
+# TODO: Add code to fill missing values in the 'bmi' column using SimpleImputer
+
+# Visualization
+
+# TODO: Create a scatterplot (Age vs. Charges)
+
+# TODO: Create a correlation heatmap
