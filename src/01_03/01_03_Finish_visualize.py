@@ -11,6 +11,10 @@ data = pd.read_csv("input/insurance.csv")
 print("First 15 rows of the dataset:")
 print(data.head(15))
 
+# Check the Missing Value Count
+print("How many values are missing?")
+print(data.isnull().sum())
+
 # Handling Missing Values
 
 # Option 3: Fill missing values with mean (SimpleImputer)
