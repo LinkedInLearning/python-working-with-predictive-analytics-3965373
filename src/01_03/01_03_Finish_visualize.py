@@ -63,7 +63,7 @@ plt.savefig("output/01_03_pairplot.png")
 plt.close()
 
 # Scatterplot: Smokers vs Non-Smokers on Age vs Charges
-sns.lmplot(x="age", y="charges", hue="smoker", data=data, palette="muted", height=7)
+sns.lmplot(x="age", y="charges", hue="smoker", data=data, palette="muted", height=7, aspect = 2)
 plt.title("Age vs Charges (Smokers vs Non-Smokers)")
 plt.tight_layout()
 plt.savefig("output/01_03_age_vs_charges.png")
