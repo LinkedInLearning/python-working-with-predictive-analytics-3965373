@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.svm import SVR
+from sklearn.ensemble import RandomForestRegressor
 
 # Load the dataset
 data = pd.read_csv("input/insurance.csv")
@@ -35,26 +35,24 @@ s_scaler = StandardScaler()
 X_train = s_scaler.fit_transform(X_train.astype(np.float64))
 X_test = s_scaler.transform(X_test.astype(np.float64))
 
-# Define the parameter grid for SVR
-param_grid_svr = {
-    'kernel': ['linear', 'poly'],
-    'degree': [2],
-    'C': [600, 700, 800, 900],
-    'epsilon': [0.0001, 0.00001, 0.000001]
-}
+# Instantiate RandomForestRegressor
+forest = RandomForestRegressor(
+    n_estimators=100,
+    criterion='squared_error',
+    random_state=1,
+    n_jobs=-1
+)
 
-# Initialize GridSearchCV for SVR
-svr = GridSearchCV(SVR(), param_grid=param_grid_svr, cv=5, verbose=3)
+# Fit the model on the training data
+forest.fit(X_train, y_train)
 
-# Fit the model using GridSearchCV
-svr.fit(X_train, y_train)
+# Predict on both training and test datasets
+y_train_pred = forest.predict(X_train)
+y_test_pred = forest.predict(X_test)
 
-# Print the best parameters
-print("\nBest Parameters from GridSearch:")
-print(svr.best_params_)
-
-# Print the final scores
-print("\nSVR Results:")
-print("svr train score: %.3f, svr test score: %.3f" % (
-    svr.score(X_train, y_train), svr.score(X_test, y_test)
-))
+# Print final scores
+print("Random Forest Regressor:")
+print(
+    "forest train score %.3f, forest test score: %.3f"
+    % (forest.score(X_train, y_train), forest.score(X_test, y_test))
+)

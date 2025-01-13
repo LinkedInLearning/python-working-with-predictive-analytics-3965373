@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.svm import SVR
 
 # Load the dataset
 data = pd.read_csv("input/insurance.csv")
@@ -16,8 +16,8 @@ print(data.head(15))
 
 # Encode categorical variables
 le = LabelEncoder()
-data['sex'] = le.fit_transform(data['sex'])
-data['smoker'] = le.fit_transform(data['smoker'])
+data['sex'] = le.fit_transform(data['sex'])      # e.g., Female=0, Male=1
+data['smoker'] = le.fit_transform(data['smoker'])# e.g., No=0, Yes=1
 region_df = pd.get_dummies(data['region'], drop_first=True)
 
 # Prepare the data
@@ -35,24 +35,17 @@ s_scaler = StandardScaler()
 X_train = s_scaler.fit_transform(X_train.astype(np.float64))
 X_test = s_scaler.transform(X_test.astype(np.float64))
 
-# Instantiate RandomForestRegressor
-forest = RandomForestRegressor(
-    n_estimators=100,
-    criterion='squared_error',
-    random_state=1,
-    n_jobs=-1
-)
+# Instantiate SVR
+svr = SVR(kernel='linear', C=300)
 
-# Fit the model on the training data
-forest.fit(X_train, y_train)
+# Fit the SVR model on the training data
+svr.fit(X_train, y_train)
 
 # Predict on both training and test datasets
-y_train_pred = forest.predict(X_train)
-y_test_pred = forest.predict(X_test)
+y_train_pred = svr.predict(X_train)
+y_test_pred = svr.predict(X_test)
 
 # Print final scores
-print("Random Forest Regressor:")
-print(
-    "forest train score %.3f, forest test score: %.3f"
-    % (forest.score(X_train, y_train), forest.score(X_test, y_test))
-)
+print("SVR (linear kernel, C=300)")
+print("Train R-squared: %.3f" % svr.score(X_train, y_train))
+print("Test R-squared:  %.3f" % svr.score(X_test, y_test))
