@@ -1,8 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder, MinMaxScaler, StandardScaler
-from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 # Load the dataset
 data = pd.read_csv("input/insurance.csv")
@@ -12,44 +11,37 @@ print("First 15 rows of the dataset:")
 print(data.head(15))
 
 # Handling Missing Values
-# Option 3: Fill missing values with mean (SimpleImputer)
+# Reload dataset to simulate a clean state after missing value handling
 imputer = SimpleImputer(strategy="mean")
 data["bmi"] = imputer.fit_transform(data[["bmi"]])
 print("\nOption 3: Fill missing values with mean (SimpleImputer)")
 print(data.isnull().sum())
 
-# Encoding Categorical Variables
-# Label encode 'sex' and 'smoker'
+# Label Encoding: Encode 'sex' and 'smoker' columns
 le = LabelEncoder()
 data['sex'] = le.fit_transform(data['sex'])
-data['smoker'] = le.fit_transform(data['smoker'])
+print("\nSklearn Label Encoding for 'sex':")
+print(dict(zip(le.classes_, le.transform(le.classes_))))
+print(data[['sex']].head(10))
 
-# One hot encode 'region'
-ohe = OneHotEncoder(sparse_output=False, drop='first')
+data['smoker'] = le.fit_transform(data['smoker'])
+print("\nSklearn Label Encoding for 'smoker':")
+print(dict(zip(le.classes_, le.transform(le.classes_))))
+print(data[['smoker']].head(10))
+
+# One Hot Encoding: Encode the 'region' column
+ohe = OneHotEncoder(sparse_output=False, drop='first')  # Drop first to avoid multicollinearity
 region_encoded = ohe.fit_transform(data[['region']])
 region_columns = ohe.get_feature_names_out(['region'])
+
+# Add one hot encoded columns back to the DataFrame
 region_df = pd.DataFrame(region_encoded, columns=region_columns)
+data = pd.concat([data.reset_index(drop=True), region_df.reset_index(drop=True)], axis=1)
+data.drop(columns=['region'], inplace=True)
 
-# Combine numerical and encoded columns
-X_num = data[['age', 'bmi', 'children']].copy()
-X_final = pd.concat([X_num, region_df, data['sex'], data['smoker']], axis=1)
+print("\nSklearn One Hot Encoding for 'region':")
+print(region_df.head(10))
 
-# Assign response variable
-y_final = data['charges']
-
-# Split the data into train and test sets
-X_train, X_test, y_train, y_test = train_test_split(X_final, y_final, test_size=0.33, random_state=0)
-
-# Normalize the training and test sets
-n_scaler = MinMaxScaler()
-X_train_normalized = n_scaler.fit_transform(X_train)
-X_test_normalized = n_scaler.transform(X_test)
-print("\nNormalized Training Data:\n", X_train_normalized[:5])
-print("Normalized Test Data:\n", X_test_normalized[:5])
-
-# Standardize the training and test sets
-s_scaler = StandardScaler()
-X_train_standardized = s_scaler.fit_transform(X_train)
-X_test_standardized = s_scaler.transform(X_test)
-print("\nStandardized Training Data:\n", X_train_standardized[:5])
-print("Standardized Test Data:\n", X_test_standardized[:5])
+# Display the updated DataFrame
+print("\nFinal DataFrame after encoding:")
+print(data.head(15))
