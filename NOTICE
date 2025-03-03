@@ -1,11 +1,39 @@
-Copyright 2023 LinkedIn Corporation
+Copyright 2025 LinkedIn Corporation
 All Rights Reserved.
 
 Licensed under the LinkedIn Learning Exercise File License (the "License").
 See LICENSE in the project root for license information.
 
 ATTRIBUTIONS:
-[PLEASE PROVIDE ATTRIBUTIONS OR DELETE THIS AND THE ABOVE LINE “ATTRIBUTIONS”]
+
+--------------------
+**requests**  
+[https://github.com/psf/requests](https://github.com/psf/requests)  
+License: Apache 2.0  
+http://www.apache.org/licenses/  
+--------------------
+**pandas**  
+[https://github.com/pandas-dev/pandas](https://github.com/pandas-dev/pandas)  
+License: BSD-3-Clause  
+https://opensource.org/licenses/BSD-3-Clause  
+--------------------
+**scikit-learn**  
+[https://github.com/scikit-learn/scikit-learn](https://github.com/scikit-learn/scikit-learn)  
+License: BSD-3-Clause  
+https://opensource.org/licenses/BSD-3-Clause  
+--------------------
+**matplotlib**  
+[https://github.com/matplotlib/matplotlib](https://github.com/matplotlib/matplotlib)  
+License: BSD-3-Clause  
+https://opensource.org/licenses/BSD-3-Clause  
+--------------------
+**seaborn**  
+[https://github.com/mwaskom/seaborn](https://github.com/mwaskom/seaborn)  
+License: BSD-3-Clause  
+https://opensource.org/licenses/BSD-3-Clause  
+--------------------
+
+If you need any more details or further assistance, feel free to ask!
 
 Please note, this project may automatically load third party code from external 
 repositories (for example, NPM modules, Composer packages, or other dependencies). 
