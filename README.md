@@ -1,34 +1,27 @@
 # Python: Working with Predictive Analytics
 This is the repository for the LinkedIn Learning course `Python: Working with Predictive Analytics`. The full course is available from [LinkedIn Learning][lil-course-url]
 
-_See the readme file in the main branch for updated instructions and information._
-## Instructions
-This repository has branches for each of the videos in the course. You can use the branch pop up menu in github to switch to a specific branch and take a look at the course at that stage, or you can add `/tree/BRANCH_NAME` to the URL to go to the branch you want to access.
+![lil-thumbnail-url]
 
-## Branches
-The branches are structured to correspond to the videos in the course. The naming convention is `CHAPTER#_MOVIE#`. As an example, the branch named `02_03` corresponds to the second chapter and the third video in that chapter. 
-Some branches will have a beginning and an end state. These are marked with the letters `b` for "beginning" and `e` for "end". The `b` branch contains the code as it is at the beginning of the movie. The `e` branch contains the code as it is at the end of the movie. The `main` branch holds the final state of the code when in the course.
+## Course Description
 
-When switching from one exercise files branch to the next after making changes to the files, you may get a message like this:
+<p>Data can tell many stories: where it came from and where it’s going. Predictive analytics gives programmers a tool to tell stories about the future: to extract usable information and make accurate predictions. These predictions, in turn, allow business to make more informed, impactful decisions. Join data scientist Isil Berkun in this course to explore predictive analytics with Python. Discover how to prepare data—fill in missing values, perform feature scaling, and more—and use prebuilt Python libraries to make and evaluate prediction models. Isil describes what models to use and when, and explains the concepts in such a way that you can immediately apply them to your own work. Check out this course and learn to leverage Python libraries like pandas and NumPy and choose the right prediction models for your projects.
+</p> 
+<p>This course includes Code Challenges powered by CoderPad. Code Challenges are interactive coding exercises with real-time feedback, so you can get hands-on coding practice alongside the course content to advance your programming skills.</p>
 
-    error: Your local changes to the following files would be overwritten by checkout:        [files]
-    Please commit your changes or stash them before you switch branches.
-    Aborting
+## Instructor
 
-To resolve this issue:
-	
-    Add changes to git using this command: git add .
-	Commit changes using this command: git commit -m "some message"
+Isil Berkun
 
-## Installing
-1. To use these exercise files, you must have the following installed:
-	- [list of requirements for course]
-2. Clone this repository into your local machine using the terminal (Mac), CMD (Windows), or a GUI tool like SourceTree.
-3. [Course-specific instructions]
+Data Scientist at Intel Corp.
+
+                            
+
+Check out my other courses on [LinkedIn Learning](https://www.linkedin.com/learning/instructors/isil-berkun?u=104).
 
 
 [0]: # (Replace these placeholder URLs with actual course URLs)
 
 [lil-course-url]: https://www.linkedin.com/learning/
-[lil-thumbnail-url]: http://
+[lil-thumbnail-url]: https://media.licdn.com/dms/image/v2/D4E0DAQGnpbINgk4ROw/learning-public-crop_675_1200/B4EZUki09UHMAY-/0/1740074864720?e=2147483647&v=beta&t=9b9vA2zFDZ8I5mfSvuZbDRA8gi2-XqtKYgPlAspSe2I
 
